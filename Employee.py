@@ -53,17 +53,12 @@ class Employee:
 
 class TestEmployee(unittest.TestCase):
     def test_constructor(self):
-        name    = 'Bob'
-        salary  = 60000
-        ID      = 102
-        mgr_ID  = 101
+        employee = Employee('Jill', 65000, 103, 101)
 
-        employee = Employee(name, salary, ID, mgr_ID)
-
-        self.assertEqual(employee.name, name)
-        self.assertEqual(employee.salary, salary)
-        self.assertEqual(employee.ID, ID)
-        self.assertEqual(employee.mgr_ID, mgr_ID)
+        self.assertEqual(employee.name, 'Jill')
+        self.assertEqual(employee.salary, 65000)
+        self.assertEqual(employee.ID, 103)
+        self.assertEqual(employee.mgr_ID, 101)
 
 
 if __name__ == '__main__':
@@ -80,9 +75,10 @@ if __name__ == '__main__':
         sys.exit()
 
     if args.runtest:
-        # clear out arguments used by the argument parser to keep unittest happy
-        # otherwise they will be unrecognized by unittest
-        sys.argv[1:] = ''
-        unittest.main()
+        # Since we are using an argument parser, in order to avoid confusion from the unit test thinking
+        # that the arguments are intended for the unit test, we put together a test suite for execution.
+        suite = unittest.TestSuite()
+        suite.addTest(TestEmployee('test_constructor'))
+        unittest.TextTestRunner(verbosity=2).run(suite)
     elif args.showdoc:
         help(Employee)

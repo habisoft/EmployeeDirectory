@@ -64,25 +64,16 @@ class Manager(Employee):
 
 class TestManager(unittest.TestCase):
     def test_constructor(self):
-        employee1   = Employee('Jill', 65000, 103, 101)
-        employee2   = Employee('Bob', 60000, 102, 101)
-
         employees   = {}
+        employee    = Employee('Zane', 85000, 104, 101)
+        employees[employee.ID] = employee
         
-        employees[employee1.name] = employee1
-        employees[employee2.name] = employee2
-        
-        mgr_name    = 'Kevin'
-        mgr_salary  = 10000000
-        mgr_emplID  = 101
-        mgr_ID      = 101
+        manager = Manager('Kevin', 1000000, 101, None, employees)
 
-        manager = Manager(mgr_name, mgr_salary, mgr_emplID, mgr_ID, employees)
-
-        self.assertEqual(manager.name, mgr_name)
-        self.assertEqual(manager.salary, mgr_salary)
-        self.assertEqual(manager.ID, mgr_emplID)
-        self.assertEqual(manager.mgr_ID, mgr_ID)
+        self.assertEqual(manager.name, 'Kevin')
+        self.assertEqual(manager.salary, 1000000)
+        self.assertEqual(manager.ID, 101)
+        self.assertEqual(manager.mgr_ID, None)
         self.assertEqual(manager.employees, employees)
 
         manager.print()
@@ -101,9 +92,10 @@ if __name__ == '__main__':
         sys.exit()
 
     if args.runtest:
-        # clear out arguments used by the argument parser to keep unittest happy
-        # otherwise they will be unrecognized by unittest
-        sys.argv[1:] = ''
-        unittest.main()
+        # Since we are using an argument parser, in order to avoid confusion from the unit test thinking
+        # that the arguments are intended for the unit test, we put together a test suite for execution.
+        suite = unittest.TestSuite()
+        suite.addTest(TestManager('test_constructor'))
+        unittest.TextTestRunner(verbosity=2).run(suite)
     elif args.showdoc:
         help(Manager)
