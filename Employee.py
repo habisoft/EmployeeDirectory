@@ -17,18 +17,18 @@ github: github: https://github.com/HabiSoft
 '''
 
 class Employee:
-    def __init__(self, name, salary, ID, mgr_ID):
+    def __init__(self, ID, name, salary, mgr_ID):
         '''
         Employee constructor/init function
 
         Parameters:
+            ID      (int):  the employee's ID
             name    (str):  the employee's name
             salary  (int):  the employee's salary
-            ID      (int):  the employee's ID
             mgr_ID   (int):  the employee's manager ID
 
         Notes:
-            if salary, ID, or mgrID are valid integers a value of -1
+            if salary, ID, or mgr_ID are valid integers a value of -1
             will flag that their was an issue, until we have something better
             if mgrID is not a valid integer, None will be used, for example,
             when the employee is the CEO this situation can happen.
@@ -37,9 +37,9 @@ class Employee:
             determine if we need a fixed length str for employee's name
         '''
         
+        self.ID     = ID if isinstance(ID, int) else -1
         self.name   = name
         self.salary = salary if isinstance(salary, int) else -1
-        self.ID     = ID if isinstance(ID, int) else -1
         self.mgr_ID = mgr_ID if isinstance(mgr_ID, int) else None
 
     def print(self):
@@ -53,13 +53,12 @@ class Employee:
 
 class TestEmployee(unittest.TestCase):
     def test_constructor(self):
-        employee = Employee('Jill', 65000, 103, 101)
+        employee = Employee(103, 'Jill', 65000, 101)
 
+        self.assertEqual(employee.ID, 103)
         self.assertEqual(employee.name, 'Jill')
         self.assertEqual(employee.salary, 65000)
-        self.assertEqual(employee.ID, 103)
         self.assertEqual(employee.mgr_ID, 101)
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

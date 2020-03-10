@@ -19,14 +19,14 @@ github: https://github.com/HabiSoft
 '''
 
 class Manager(Employee):
-    def __init__(self, name, salary, ID, mgr_ID, employees):
+    def __init__(self, ID, salary, name, mgr_ID, employees):
         '''
         Manager constructor/init function
 
         Inherited parameters:
+            ID      (int):  the employee's ID
             name    (str):  the employee's name
             salary  (int):  the employee's salary
-            ID      (int):  the employee's ID
             mgr_ID  (int):  the manager's ID
         
         Parameters of the derived Manager class:
@@ -41,7 +41,7 @@ class Manager(Employee):
             determine if we need a fixed length str for employee's name
         '''
         
-        Employee.__init__(self, name=name, salary=salary, ID=ID, mgr_ID=mgr_ID)
+        Employee.__init__(self, ID=ID, name=name, salary=salary, mgr_ID=mgr_ID)
         self.employees  = employees if isinstance(employees, dict) else dict()
 
     def add_employee(self, employee):
@@ -64,15 +64,15 @@ class Manager(Employee):
 
 class TestManager(unittest.TestCase):
     def test_constructor(self):
-        employees   = {}
-        employee    = Employee('Zane', 85000, 104, 101)
-        employees[employee.ID] = employee
+        employees               = {}
+        employee                = Employee(104, 'Zane', 85000, 101)
+        employees[employee.ID]  = employee
         
-        manager = Manager('Kevin', 1000000, 101, None, employees)
+        manager = Manager(101, 1000000, 'Kevin', None, employees)
 
+        self.assertEqual(manager.ID, 101)
         self.assertEqual(manager.name, 'Kevin')
         self.assertEqual(manager.salary, 1000000)
-        self.assertEqual(manager.ID, 101)
         self.assertEqual(manager.mgr_ID, None)
         self.assertEqual(manager.employees, employees)
 
