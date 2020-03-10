@@ -91,7 +91,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     
     # add optional arguments to the argument parser
-    parser.add_argument('-test', '--runtest', action='store_true', help='perform self test on Employee class.')
+    parser.add_argument('-test', '--runtest', action='store_true', help='perform self test on Manager class.')
     parser.add_argument('-doc', '--showdoc', action='store_true', help='print documentation for Employee class.')
 
     args = parser.parse_args()
