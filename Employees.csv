@@ -1,0 +1,9 @@
+ID,Employee Name,Salary,Manager ID
+101,Jeff,100000,
+154,Suzanne,61000,109
+109,Dave,85000,101
+110,Andy,65000,109
+199,Dan,60000,109
+213,Cory,65000,101
+132,Jason,60000,109
+133,Rick,56000,109
