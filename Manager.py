@@ -21,9 +21,9 @@ github: https://github.com/HabiSoft
 class Manager(Employee):
     def __init__(self, name, salary, ID, mgr_ID, employees):
         '''
-        Manager constructor
+        Manager constructor/init function
 
-        Parameters from base class:
+        Inherited parameters:
             name    (str):  the employee's name
             salary  (int):  the employee's salary
             ID      (int):  the employee's ID
@@ -88,8 +88,6 @@ class TestManager(unittest.TestCase):
         manager.print()
 
 if __name__ == '__main__':
-    unittest.main()
-    '''
     parser = argparse.ArgumentParser()
     
     # add optional arguments to the argument parser
@@ -103,12 +101,9 @@ if __name__ == '__main__':
         sys.exit()
 
     if args.runtest:
-        #e1 = Employee('Kevin', 1000000, 101)
-        #e1.print()
-        employee_test = TestEmployee()
-        employee_test.test_constructor()
-        #employee_test.main()
-        #unittest.main()
+        # clear out arguments used by the argument parser to keep unittest happy
+        # otherwise they will be unrecognized by unittest
+        sys.argv[1:] = ''
+        unittest.main()
     elif args.showdoc:
-        help(Employee)
-        '''
+        help(Manager)
