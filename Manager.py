@@ -19,7 +19,7 @@ github: https://github.com/HabiSoft
 '''
 
 class Manager(Employee):
-    def __init__(self, ID, salary, name, mgr_ID, employees):
+    def __init__(self, ID, name, salary, mgr_ID, employees):
         '''
         Manager constructor/init function
 
@@ -45,7 +45,7 @@ class Manager(Employee):
         self.employees  = employees if isinstance(employees, dict) else dict()
 
     def add_employee(self, employee):
-        employees[employee.name] = employee
+        self.employees[employee.name] = employee
 
     def print(self):
         '''
@@ -59,8 +59,8 @@ class Manager(Employee):
         # commented below, since indented is nice for console
         #print('Employees of %s:' % self.name)
         
-        for key, value in sorted(self.employees.items()):
-            print('\t- %s' % value.name)
+        for ID, employee in sorted(self.employees.items()):
+            print('\t- %s' % employee.name)
 
 class TestManager(unittest.TestCase):
     def test_constructor(self):
