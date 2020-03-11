@@ -15,7 +15,7 @@ name, salary, and ID. It implements the manager ID
 
 author: Habib Moukalled
 email:  habib.moukalled@gmail.com
-github: https://github.com/HabiSoft
+github: https://github.com/habisoft/EmployeeDirectory
 '''
 
 class Manager(Employee):
@@ -60,7 +60,10 @@ class Manager(Employee):
         #print('Employees of %s:' % self.name)
         
         for ID, employee in sorted(self.employees.items()):
-            print('\t- %s' % employee.name)
+            if isinstance(employee, Manager):
+                employee.print()
+            else:
+                print('\t- %s' % employee.name)
 
 class TestManager(unittest.TestCase):
     def test_constructor(self):

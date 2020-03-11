@@ -13,7 +13,7 @@ name, their salary, and their employee ID.
 
 author: Habib Moukalled
 email:  habib.moukalled@gmail.com
-github: github: https://github.com/HabiSoft
+github: github: https://github.com/habisoft/EmployeeDirectory
 '''
 
 class Employee:

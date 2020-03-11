@@ -4,10 +4,6 @@ import sys
 import argparse
 import unittest
 import csv
-import pandas
-import numpy
-
-from collections import defaultdict
 
 from Employee import Employee
 from Manager import Manager
@@ -18,7 +14,7 @@ Documentation for a test script
 
 author: Habib Moukalled
 email:  habib.moukalled@gmail.com
-github: https://github.com/HabiSoft
+github: https://github.com/habisoft/EmployeeDirectory
 '''
 
 class TestEmployeeHierarchy(unittest.TestCase):
@@ -57,35 +53,37 @@ class TestEmployeeHierarchy(unittest.TestCase):
             csv_reader = csv.reader(csv_file, delimiter=',')
 
             # there is likely a more elegant way to index into the CSV file
-            # but this is what we are using for now
-            empl_id_idx = 0
-            name_idx    = 1
-            salary_idx  = 2
-            mgr_id_idx  = 3
+            # but this is what we are using for now, for exmaple, if we 
+            # use something like pandas we can query the data much like a database
+            empl_id_idx     = 0
+            name_idx        = 1
+            salary_idx      = 2
+            mgr_id_idx      = 3
 
-            mgr_IDs     = set()
-            employees   = {}
-            managers    = {}
-            manager_map = defaultdict(list)
-            reports     = {}
-            
+            mgr_IDs         = set()
+            ceo_ID          = -1
+            employees       = {}
+            total_salary    = 0
+
             # skip over the CSV-file's header
             next(csv_reader)
-            
-            ceo_manager = {}
+                        
+            #employees[0] = Employee(-1, None, None, None)
 
             # now iterate through the rest of the CSV file
             for row in csv_reader:
-                ID      = int(row[empl_id_idx])
-                name    = str(row[name_idx])
-                salary  = int(row[salary_idx])
-                
+                ID              = int(row[empl_id_idx])
+                name            = str(row[name_idx])
+                salary          = int(row[salary_idx])
+                total_salary    = total_salary + salary # accumulate our total salary
+
                 try:
                     mgr_ID = int(row[mgr_id_idx])
                 except ValueError:
                     # if we get an exception that means we are trying to convert None to an int()
-                    mgr_ID = -1
-                    ceo_manager = Manager(ID, name, salary, mgr_ID, None)
+                    # this means we are looking at the CEO's manager ID.
+                    mgr_ID = 0
+                    ceo_ID  = ID
 
                 print('ID: %d, name: %s, salary: %d, mgr_ID: %d' % (ID, name, salary, mgr_ID))
 
@@ -94,112 +92,27 @@ class TestEmployeeHierarchy(unittest.TestCase):
                 employee        = Employee(ID, name, salary, mgr_ID)
                 employees[ID]   = employee
                 
-                if employee.mgr_ID == ceo_manager.ID:
-                    ceo_manager.add_employee(employee)
-                
-            # let's handle the CEO first, as it is our base case:
-            #ceo_manager.print()
-            managers[ceo_manager.ID] = ceo_manager
-
-            for mgr_ID in mgr_IDs:
-                if employee.mgr_ID == -1:
-                    managers[mgr_ID] = ceo_manager
-                else:
-                    managers[mgr_ID] = Manager(mgr_ID, None, None, None, -1)
-
-            for ID, employee in employees.items():
-                if employee.mgr_ID != -1:
-                    mgr             = employees[employee.mgr_ID]
-                    manager         = managers[employee.mgr_ID]
-                    manager.ID      = mgr.ID
-                    manager.name    = mgr.name
-                    manager.salary  = mgr.salary
-                    manager.mgr_ID  = employees[manager.ID].mgr_ID
-                    
-                    manager.add_employee(employee)
-                    managers[manager.ID] = manager
-            
-            for mgr_ID, manager in managers.items():
-                manager.print()
-
-            #ceo_manager.print()
-
-        '''
+            # Build and initialize a list of managers using the
+            # manager IDs we collected above
             managers = {}
-            managers[ceo_manager.ID] = ceo_manager
+            for mgr_ID in mgr_IDs:
+                if mgr_ID != 0:
+                    employee = employees[mgr_ID]
+                    managers[mgr_ID] = Manager(employee.ID, employee.name, employee.salary, employee.mgr_ID, None)
 
+            # one final pass to build up the manager/employee hierarchy
             for ID, employee in employees.items():
+                if employee.ID not in mgr_IDs:
+                    managers[employee.mgr_ID].add_employee(employee)
+                elif employee.mgr_ID != 0:
+                    managers[employee.mgr_ID].add_employee(managers[employee.ID])
 
-            for mgr_ID in sorted(mgr_IDs):
-                # if our mgr_ID is -1, skip it, as we already handled it
-                if mgr_ID == -1:
-                    continue
-                
-                ID      = employees[mgr_ID].ID
-                name    = employees[mgr_ID].name
-                salary  = employees[mgr_ID].salary
-                mgr_ID  = employees[mgr_ID].mgr_ID
-                
+            # print our organization hierarchy
+            managers[ceo_ID].print()
 
-                managers[ID].add_employee(
-                #manager = Manager
-            '''
-'''
-        # use pandas to ingest the CSV file, here we provde the expected column header format
-        data_frame = pandas.read_csv('Employees.csv', names=['ID', 'Employee Name', 'Salary', 'Manager ID'])
-        print(data_frame)
-
-        # build a relation between employee ID and the ID of the manager they report to
-        empl_mgr_map = dict(zip(data_frame['ID'].values[1:], data_frame['Manager ID'].values[1:]))
-        print(empl_mgr_map)
-        
-        # find the entry in the data where the manager ID is None/NULL, this corresponds to our CEO
-        # for this implementation we are assuming that there will only be one entry with a None/NULL
-        # for the manager ID this assumption is likely dangerous for production code
-        ceo_data    = data_frame[data_frame['Manager ID'].isnull()]
-        ceo_ID      = int(ceo_data['ID'].values[0])
-        ceo_name    = ceo_data['Employee Name'].values[0]
-        ceo_salary  = int(ceo_data['Salary'].values[0])
-        ceo_mgr_ID  = None
-        
-        ceo_manager = Manager(ceo_ID, ceo_name, ceo_salary, ceo_mgr_ID, None)
-        
-        # the first element is the column header, so let's skip it
-        mgr_IDs = data_frame['Manager ID'].values[1:]
-
-        managers = {}
-        for mgr_ID in mgr_IDs:
-            if mgr_ID == ceo_manager.mgr_ID:
-                print('found NaN')
-                continue
-
-            manager_data = data_frame[data_frame['ID'] == mgr_ID]
-            #manager = Manager(
-            #print(manager_data.values)
-            print(mgr_ID)
-            #managers[mgr_ID] 
-
-        #for index, row in data_frame.iterrows():
-        #    print(row)
-        #print(manager_groups)
-        #for key, value in sorted((value, key) for (key, value) in empl_mgr_map.items()):
-        #    print('empl_ID: %s, mgr_ID: %s' % (empl_ID, mgr_ID))
-        
-        #for empl_ID, mgr_ID in sorted(empl_mgr_map.items()):
-        #    print('empl_ID: %s, mgr_ID: %s' % (empl_ID, mgr_ID))
-
-        #manager_data = data_frame[data_frame['Manager ID'] == ceo_ID]
-        #manager_data = data_frame.groupby(['Manager ID']).groups
-        #print(manager_data)
-
-        #for item in manager_data.itertuples():
-        #    print(item)
-
-        #while manager_data != None:
-        #    print(manager_data)
-            
-        #ceo_manager.print()
-'''
+            # build a formatted salary string and print it
+            salary_string = format(total_salary, ',d')
+            print('\nTotal salary: $%s' % salary_string)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
